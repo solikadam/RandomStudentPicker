@@ -1,0 +1,20 @@
+#1A
+1;Anna Kowalska
+2;Jan Nowak
+3;Katarzyna Wiœniewska
+4;Piotr Zieliñski
+5;Maria Lewandowska
+#1B
+1;Beata Stêpieñ
+2;Cezary Górski
+3;Dorota Pawlak
+4;Emil Król
+5;Filipina Mazurek
+#1C
+1;Alicja Chmiel
+2;Bartosz Dudek
+3;Celina Jastrzêbska
+4;Damian Ko³odziej
+5;Eliza Marciniak
+#2A
+1;Bartosz Jamajka
