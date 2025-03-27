@@ -1,26 +1,70 @@
-﻿contentpage {
-    background-color: #f0f0f0;
-}
-
-entry {
-    border-color: #ccc;
-    border-width: 1;
-}
-
-button {
-    background-color: #4CAF50;
+﻿^contentpage {
+    background-color: #0a1a2b; 
+    padding: 16px;
+    font-family: 'Arial', sans-serif;
     color: white;
 }
 
-    button#pickButton {
-        background-color: #2196F3;
-    }
-
-label {
-    font-size: 16;
-    color: #333;
+.lista_klas {
+    background-color: #1b2b42; 
+    gap: 8px;
+    padding: 10px;
+    border-radius: 8px;
 }
 
-stacklayout > label {
+.lista_uczniow {
+    background-color: #1b2b42; 
+    padding: 10px;
+    border-radius: 8px;
+}
+
+.uczen_w_liscie {
+    margin-top: 8px;
+    background-color: #2a3a58; 
+    color: white;
+    text-align: center;
+    font-size: 20px;
     font-weight: bold;
+    padding: 12px;
+    border-radius: 6px;
+    transition: background-color 0.3s ease;
+}
+
+    .uczen_w_liscie:hover {
+        background-color: #334a7a; 
+    }
+
+.button {
+    background-color: #003366; 
+    color: white;
+    padding: 12px 20px;
+    font-size: 16px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+    .button:hover {
+        background-color: #004080; 
+    }
+
+#klasa_w_liscie {
+    margin-top: 8px;
+    background-color: #2a3a58; 
+    color: white;
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold;
+    padding: 12px;
+    border-radius: 10px;
+    transition: background-color 0.3s ease;
+}
+
+    #klasa_w_liscie:hover {
+        background-color: #334a7a; 
+    }
+
+#ClassDetailsPage {
+    background-color: #0a1a2b; 
 }

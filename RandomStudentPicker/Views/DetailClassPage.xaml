@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="RandomStudentPicker.Views.DetailClassPage"
+             Title="DetailClassPage">
+    <ContentPage.Resources>
+        <StyleSheet Source="/Resources/Styles/Styles.css" />
+    </ContentPage.Resources>
+
+    <StackLayout Padding="10">
+
+        <ListView StyleClass="lista_uczniow" 
+                  x:Name="StudentsList" 
+                  ItemTapped="OnStudentTapped" 
+                  ItemsSource="{Binding Students}">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <ViewCell>
+                        <Label Text="{Binding Name}" StyleClass="uczen_w_liscie" />
+                    </ViewCell>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+
+        <StackLayout Orientation="Horizontal" 
+                     HorizontalOptions="CenterAndExpand" 
+                     Spacing="10">
+            <Button StyleClass="button" 
+                    Text="Dodaj Ucznia" 
+                    Clicked="OnAddStudentClicked" />
+            <Button StyleClass="button" 
+                    Text="Losuj Ucznia" 
+                    Clicked="OnStartRandomSelectionClicked" />
+        </StackLayout>
+
+        <CollectionView x:Name="RandomSelectionList" 
+                        SelectionMode="Multiple" 
+                        IsVisible="{Binding IsRandomSelectionVisible}">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <StackLayout Orientation="Horizontal" Padding="10">
+                        <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}" />
+                        <Label Text="{Binding Name}" VerticalOptions="Center" />
+                    </StackLayout>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <Button Text="Wylosuj" 
+                x:Name="RandomButton" 
+                Clicked="OnPerformRandomSelectionClicked" 
+                IsVisible="{Binding IsRandomSelectionVisible}" 
+                StyleClass="button" />
+    </StackLayout>
+</ContentPage>

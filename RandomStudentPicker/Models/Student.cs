@@ -1,9 +1,10 @@
-﻿namespace RandomStudentPicker.Models;
+﻿using System.ComponentModel;
+using System.Runtime.CompilerServices;
+
+namespace RandomStudentPicker.Models;
 
 public class Student
 {
     public string Name { get; set; }
-    public string ClassName { get; set; }
-    public int JournalNumber { get; set; } 
-    public bool IsLucky { get; set; }
+    public bool IsSelected { get; set; } // This should exist in the Student model.
 }

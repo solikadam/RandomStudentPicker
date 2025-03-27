@@ -7,151 +7,91 @@ using RandomStudentPicker.Models;
 
 namespace RandomStudentPicker.Services
 {
-    public class FileService
+    public static class FileService
     {
-        private readonly string _basePath = FileSystem.AppDataDirectory;
+        private static readonly string LocalAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+        private static string ClassesFilePath => Path.Combine(LocalAppData, "Classes.txt");
 
-        public FileService()
+        private static string GetFilePath(string fileName) => Path.Combine(LocalAppData, fileName);
+
+        public static async Task<List<string>> GetClassesAsync()
         {
-            Task.Run(InitializePredefinedClassesFromFileAsync).Wait();
+            return await ReadFileLinesAsync(ClassesFilePath);
         }
 
-        // Inicjalizowanie klas ze wstępnie zdefiniowanego pliku
-        private async Task InitializePredefinedClassesFromFileAsync()
+        public static async Task AddClassAsync(string className)
         {
-            System.Diagnostics.Debug.WriteLine("Starting initialization from PredefinedClasses.txt");
+            await AppendLineToFileAsync(ClassesFilePath, className);
+        }
 
-            try
+        public static async Task DeleteClassAsync(string className)
+        {
+            await RemoveLineFromFileAsync(ClassesFilePath, className);
+            File.Delete(GetFilePath($"Students_{className}.txt"));
+            File.Delete(GetFilePath($"RoundHistory_{className}.txt"));
+        }
+
+        public static async Task<List<string>> GetStudentsAsync(string className)
+        {
+            return await ReadFileLinesAsync(GetFilePath($"Students_{className}.txt"));
+        }
+
+        public static async Task AddStudentAsync(string className, string studentName)
+        {
+            await AppendLineToFileAsync(GetFilePath($"Students_{className}.txt"), studentName);
+        }
+
+        public static async Task UpdateStudentAsync(string className, string oldName, string newName)
+        {
+            await ReplaceLineInFileAsync(GetFilePath($"Students_{className}.txt"), oldName, newName);
+        }
+
+        public static async Task DeleteStudentAsync(string className, string studentName)
+        {
+            await RemoveLineFromFileAsync(GetFilePath($"Students_{className}.txt"), studentName);
+        }
+
+        public static async Task SaveRoundHistoryAsync(string className, List<string> participatingStudents, List<string> excludedStudents)
+        {
+            string filePath = GetFilePath($"RoundHistory_{className}.txt");
+            string historyEntry = $"Runda: {DateTime.Now}\n" +
+                                  $"Uczestnicy: {string.Join(", ", participatingStudents)}\n" +
+                                  $"Wykluczeni: {string.Join(", ", excludedStudents)}\n";
+                                 
+            await AppendTextToFileAsync(filePath, historyEntry);
+        }
+
+        private static async Task<List<string>> ReadFileLinesAsync(string filePath)
+        {
+            return File.Exists(filePath) ? (await File.ReadAllLinesAsync(filePath)).ToList() : new List<string>();
+        }
+
+        private static async Task AppendLineToFileAsync(string filePath, string line)
+        {
+            if (!File.Exists(filePath) || !(await File.ReadAllLinesAsync(filePath)).Contains(line))
             {
-                string filePath = "Raw/PredefinedClasses.txt";  // Ścieżka do zasobu w pakiecie aplikacji
-
-                System.Diagnostics.Debug.WriteLine($"Looking for PredefinedClasses.txt in resources at {filePath}");
-
-                using var stream = await FileSystem.OpenAppPackageFileAsync(filePath); // Dostęp do pliku z zasobów aplikacji
-
-                if (stream == null)
-                {
-                    System.Diagnostics.Debug.WriteLine("PredefinedClasses.txt not found in resources!");
-                    return;
-                }
-
-                using var reader = new StreamReader(stream);
-                string content = await reader.ReadToEndAsync();
-                var lines = content.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
-
-                string currentClassName = null;
-                var students = new List<Student>();
-
-                // Przetwarzanie wierszy z pliku
-                foreach (var line in lines)
-                {
-                    string trimmedLine = line.Trim();
-                    System.Diagnostics.Debug.WriteLine($"Processing: '{trimmedLine}'");
-
-                    if (string.IsNullOrEmpty(trimmedLine))
-                        continue;
-
-                    if (trimmedLine.StartsWith("#"))
-                    {
-                        if (currentClassName != null && students.Count > 0)
-                        {
-                            SaveClassList(currentClassName, students);
-                            System.Diagnostics.Debug.WriteLine($"Saved class: {currentClassName} with {students.Count} students");
-                            students.Clear();
-                        }
-                        currentClassName = trimmedLine.Substring(1);
-                    }
-                    else if (currentClassName != null)
-                    {
-                        var parts = trimmedLine.Split(';');
-                        if (parts.Length == 2 && int.TryParse(parts[0], out int journalNumber))
-                        {
-                            students.Add(new Student
-                            {
-                                JournalNumber = journalNumber,
-                                Name = parts[1].Trim(),
-                                ClassName = currentClassName
-                            });
-                            System.Diagnostics.Debug.WriteLine($"Added: {journalNumber};{parts[1]} to {currentClassName}");
-                        }
-                        else
-                        {
-                            System.Diagnostics.Debug.WriteLine($"Invalid line format: '{trimmedLine}'");
-                        }
-                    }
-                }
-
-                if (currentClassName != null && students.Count > 0)
-                {
-                    SaveClassList(currentClassName, students);
-                    System.Diagnostics.Debug.WriteLine($"Saved final class: {currentClassName} with {students.Count} students");
-                }
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Error loading PredefinedClasses.txt: {ex.Message}");
+                await File.AppendAllTextAsync(filePath, line + "\n");
             }
         }
 
-        // Zapis klasy do lokalnego pliku
-        public void SaveClassList(string className, List<Student> students)
+        private static async Task RemoveLineFromFileAsync(string filePath, string lineToRemove)
         {
-            // Utworzenie pełnej ścieżki do pliku w AppData
-            string filePath = Path.Combine(_basePath, $"{className}.txt");
-            var lines = students.Select(s => $"{s.JournalNumber};{s.Name}").ToList();
-
-            // Zapisanie do pliku
-            File.WriteAllLines(filePath, lines);
-            System.Diagnostics.Debug.WriteLine($"Saved {students.Count} students to {filePath}");
+            if (!File.Exists(filePath)) return;
+            var lines = (await File.ReadAllLinesAsync(filePath)).Where(line => line != lineToRemove).ToList();
+            await File.WriteAllLinesAsync(filePath, lines);
         }
 
-        // Wczytanie listy studentów z pliku klasy
-        public List<Student> LoadClassList(string className)
+        private static async Task ReplaceLineInFileAsync(string filePath, string oldLine, string newLine)
         {
-            string filePath = Path.Combine(_basePath, $"{className}.txt");
-            System.Diagnostics.Debug.WriteLine($"Trying to load class list from {filePath}");
-
-            if (File.Exists(filePath))
-            {
-                var lines = File.ReadAllLines(filePath);
-                var students = new List<Student>();
-                foreach (var line in lines)
-                {
-                    var parts = line.Split(';');
-                    if (parts.Length == 2 && int.TryParse(parts[0], out int journalNumber))
-                    {
-                        students.Add(new Student
-                        {
-                            JournalNumber = journalNumber,
-                            Name = parts[1].Trim(),
-                            ClassName = className
-                        });
-                    }
-                }
-                System.Diagnostics.Debug.WriteLine($"Loaded {students.Count} students from {filePath}");
-                return students;
-            }
-            System.Diagnostics.Debug.WriteLine($"No file found for {className}");
-            return new List<Student>();
+            if (!File.Exists(filePath)) return;
+            var lines = (await File.ReadAllLinesAsync(filePath)).Select(line => line == oldLine ? newLine : line).ToList();
+            await File.WriteAllLinesAsync(filePath, lines);
         }
 
-        // Pobranie nazw klas dostępnych w lokalnym katalogu
-        public List<string> GetClassNames()
+        private static async Task AppendTextToFileAsync(string filePath, string text)
         {
-            string filePath = Path.Combine(_basePath, "ClassNames.txt");
-
-            if (File.Exists(filePath))
-            {
-                return File.ReadAllLines(filePath).ToList();
-            }
-
-            return new List<string>();
-        }
-
-        public void SaveClassNames(List<string> classNames)
-        {
-            string filePath = Path.Combine(_basePath, "ClassNames.txt");
-            File.WriteAllLines(filePath, classNames);
+            await File.AppendAllTextAsync(filePath, text);
         }
     }
+
 }
