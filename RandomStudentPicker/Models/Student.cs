@@ -5,6 +5,8 @@ namespace RandomStudentPicker.Models;
 
 public class Student
 {
-    public string Name { get; set; }
-    public bool IsSelected { get; set; } // This should exist in the Student model.
+    public string FirstName { get; set; }
+    public string LastName { get; set; }
+
+    public override string ToString() => $"{FirstName} {LastName}";
 }

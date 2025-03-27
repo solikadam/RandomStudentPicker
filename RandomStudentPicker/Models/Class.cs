@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 
 namespace RandomStudentPicker.Models
 {
-    internal class Class
+    public class Class
     {
-        public string Name { get; set; }
+        public string ClassName { get; set; }
+        public List<Student> Students { get; set; } = new();
     }
 }

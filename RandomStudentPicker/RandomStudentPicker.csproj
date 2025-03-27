@@ -67,13 +67,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <MauiXaml Update="Views\DetailClassPage.xaml">
+	  <MauiXaml Update="Views\ClassManagementPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	</ItemGroup>
-
-	<ItemGroup>
-		<MauiAsset Include="Resources\Styles\Styles.css" />
+	  <MauiXaml Update="Views\StudentListPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	</ItemGroup>
 
 </Project>

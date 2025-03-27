@@ -1,72 +1,62 @@
 ﻿using RandomStudentPicker.Models;
 using RandomStudentPicker.Services;
-using System;
-using System.Collections.ObjectModel;
-using System.Threading.Tasks;
+using RandomStudentPicker.Views;
 
 namespace RandomStudentPicker.Views
 {
     public partial class MainPage : ContentPage
     {
-        public ObservableCollection<string> Classes { get; private set; } = new();
+        private readonly FileService _fileService;
+        private readonly RandomPickerService _randomPickerService;
+        private Class _currentClass;
 
         public MainPage()
         {
             InitializeComponent();
-            LoadClasses();
+            _fileService = new FileService();
+            _randomPickerService = new RandomPickerService();
+            LoadAvailableClasses();
         }
 
-        private async void LoadClasses()
+        protected override void OnAppearing()
         {
-            var classes = await FileService.GetClassesAsync();
-            Classes.Clear();
-            foreach (var className in classes)
-            {
-                Classes.Add(className);
-            }
-            ClassesList.ItemsSource = Classes;
+            base.OnAppearing();
+            LoadAvailableClasses();
         }
 
-        private async void OnAddClassClicked(object sender, EventArgs e)
+        private void LoadAvailableClasses()
         {
-            string result = await DisplayPromptAsync("Nowa Klasa", "Podaj nazwę klasy:");
-            if (!string.IsNullOrEmpty(result))
-            {
-                await FileService.AddClassAsync(result);
-                LoadClasses();
-            }
+            ClassPicker.ItemsSource = _fileService.GetAvailableClasses();
         }
 
-        private async void OnDeleteClassClicked(object sender, EventArgs e)
+        private async void OnLoadClassClicked(object sender, EventArgs e)
         {
-            if (!Classes.Any())
+            if (ClassPicker.SelectedItem == null)
             {
-                await DisplayAlert("Błąd", "Brak dostępnych klas do usunięcia.", "OK");
+                await DisplayAlert("Błąd", "Wybierz klasę z listy", "OK");
                 return;
             }
 
-            string selectedClass = await DisplayActionSheet("Wybierz klasę do usunięcia", "Anuluj", null, Classes.ToArray());
-
-            if (!string.IsNullOrEmpty(selectedClass) && selectedClass != "Anuluj")
-            {
-                bool confirm = await DisplayAlert("Usuń Klasę", $"Czy na pewno chcesz usunąć klasę {selectedClass}?", "Tak", "Nie");
-                if (confirm)
-                {
-                    await FileService.DeleteClassAsync(selectedClass);
-                    LoadClasses();
-                }
-            }
+            var className = ClassPicker.SelectedItem.ToString();
+            _currentClass = _fileService.LoadClass(className);
+            ResultLabel.Text = $"Wczytano klasę: {className} ({_currentClass.Students.Count} uczniów)";
         }
 
-        private void OnClassSelected(object sender, SelectedItemChangedEventArgs e)
+        private void OnPickRandomClicked(object sender, EventArgs e)
         {
-            if (e.SelectedItem == null)
+            if (_currentClass == null || _currentClass.Students.Count == 0)
+            {
+                ResultLabel.Text = "Najpierw wczytaj klasę z uczniami";
                 return;
+            }
 
-            string selectedClass = e.SelectedItem.ToString();
-            Navigation.PushAsync(new DetailClassPage(selectedClass));
+            var student = _randomPickerService.PickRandomStudent(_currentClass);
+            ResultLabel.Text = $"Wylosowany uczeń: {student}";
+        }
 
-            ((ListView)sender).SelectedItem = null;
+        private async void OnManageClassesClicked(object sender, EventArgs e)
+        {
+            await Navigation.PushAsync(new ClassManagementPage());
         }
     }
 }

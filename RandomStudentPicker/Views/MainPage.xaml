@@ -1,34 +1,44 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+﻿<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="RandomStudentPicker.Views.MainPage"
-             Title="Student Picker">
-    
+             Title="Random Student Picker">
+
     <ContentPage.Resources>
-        <StyleSheet Source="/Resources/Styles/Styles.css" />
+        <StyleSheet Source="/Resources/Styles/styles.css" />
     </ContentPage.Resources>
-    
-    <StackLayout Padding="10">
-        <ListView StyleClass="lista_klas" 
-                  x:Name="ClassesList" 
-                  ItemSelected="OnClassSelected">
-            <ListView.ItemTemplate>
-                <DataTemplate>
-                    <ViewCell>
-                        <Label Text="{Binding}" StyleClass="klasa_w_liscie" />
-                    </ViewCell>
-                </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
-        <StackLayout Orientation="Horizontal" 
-                     HorizontalOptions="CenterAndExpand" 
-                     Spacing="10">
-            <Button StyleClass="button" 
-                    Text="Dodaj Klasę" 
-                    Clicked="OnAddClassClicked" />
-            <Button StyleClass="button" 
-                    Text="Usuń Klasę" 
-                    Clicked="OnDeleteClassClicked" />
-        </StackLayout>
-    </StackLayout>
+
+    <ScrollView>
+        <VerticalStackLayout Spacing="20" Padding="20" StyleClass="main-page">
+            <Label Text="System losowania osoby do odpowiedzi" 
+                   StyleClass="header-label"/>
+
+            <Frame StyleClass="card">
+                <VerticalStackLayout Spacing="15">
+                    <Label Text="Wybierz klasę:" 
+                           StyleClass="header-label"/>
+                    <Picker x:Name="ClassPicker" 
+                            Title="Wybierz klasę..."
+                            StyleClass="input-field"/>
+                    <Button Text="Wczytaj klasę" 
+                            Clicked="OnLoadClassClicked"
+                            StyleClass="primary-button"/>
+                </VerticalStackLayout>
+            </Frame>
+
+            <Frame StyleClass="card">
+                <VerticalStackLayout Spacing="15">
+                    <Button Text="Losuj ucznia" 
+                            Clicked="OnPickRandomClicked"
+                            StyleClass="accent-button"/>
+                    <Label x:Name="ResultLabel" 
+                           Text="Wybierz klasę i wylosuj ucznia"
+                           HorizontalOptions="Center"/>
+                </VerticalStackLayout>
+            </Frame>
+
+            <Button Text="Zarządzaj klasami" 
+                    Clicked="OnManageClassesClicked"
+                    StyleClass="primary-button"/>
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>

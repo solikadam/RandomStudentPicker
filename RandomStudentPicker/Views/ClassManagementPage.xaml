@@ -1,0 +1,62 @@
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="RandomStudentPicker.Views.ClassManagementPage"
+             Title="Zarządzanie klasami"
+             StyleClass="app-container">
+
+    <ContentPage.Resources>
+        <StyleSheet Source="/Resources/Styles/styles.css" />
+    </ContentPage.Resources>
+
+    <ScrollView>
+        <VerticalStackLayout Spacing="20" Padding="20">
+            <Label Text="Zarządzanie klasami" 
+                   StyleClass="text-header"/>
+
+            <Frame StyleClass="card-style">
+                <VerticalStackLayout Spacing="15">
+                    <Label Text="Nowa klasa:" 
+                           StyleClass="text-normal"/>
+                    <Entry x:Name="NewClassNameEntry" 
+                           Placeholder="Wprowadź nazwę klasy"
+                           StyleClass="form-control"/>
+                    <Button Text="Utwórz nową klasę" 
+                            Clicked="OnCreateClassClicked"
+                            StyleClass="btn btn-primary"/>
+                </VerticalStackLayout>
+            </Frame>
+
+            <Label Text="Lista istniejących klas:" 
+                   StyleClass="text-normal"/>
+
+            <CollectionView x:Name="ClassesCollectionView">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Frame StyleClass="card-style">
+                            <Grid Padding="10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <Label Text="{Binding ClassName}" 
+                                       StyleClass="text-normal"/>
+
+                                <Button Grid.Column="1" 
+                                        Text="Edytuj" 
+                                        Clicked="OnEditClassClicked"
+                                        StyleClass="btn btn-accent btn-small"/>
+
+                                <Button Grid.Column="2" 
+                                        Text="Usuń" 
+                                        Clicked="OnDeleteClassClicked"
+                                        StyleClass="btn btn-danger btn-small"/>
+                            </Grid>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

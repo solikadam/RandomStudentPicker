@@ -1,4 +1,6 @@
-﻿namespace RandomStudentPicker
+﻿using Microsoft.Maui.Controls.StyleSheets;
+
+namespace RandomStudentPicker
 {
     public partial class App : Application
     {
@@ -8,5 +10,6 @@
 
             MainPage = new AppShell();
         }
+        
     }
 }
